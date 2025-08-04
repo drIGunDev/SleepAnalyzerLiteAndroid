@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SleepAnalyzer</string>
+    <string name="brand_name">SleepAnalyzer</string>
+
+    <string name="max_hr">max HR: %3.0f</string>
+    <string name="min_hr">min HR: %3.0f</string>
+
+    <string name="min_hr_text">min HR (BPM)</string>
+    <string name="max_hr_text">max HR (BPM)</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="duration">Длительность: %s</string>
+
+    <string name="notification_channel_name">Запрос к Bluetooth-сенсору для приложения SleepAnalyzer</string>
+    <string name="notification_text">Анализ сна работает в фоновом режиме</string>
+
+    <string name="permissions_not_granted_title">Нет разрешений</string>
+    <string name="permissions_not_granted_text">Следующие разрешения не предоставлены:\n%s\n\nПриложение не может начать связь с сенсором.</string>
+
+    <string name="sleep_satisfaction_title">Удовлетворённость сном</string>
+    <string name="sleep_rating_acquire_text">Пожалуйста, оцените свой сон, выберите смайлик из списка:</string>
+
+    <string name="select_sensor_title">Выбор сенсора</string>
+    <string name="select_sensor_text">Пожалуйста, выберите сенсор из списка ниже:</string>
+
+    <string name="rescale_title">Масштабирование</string>
+    <string name="rescaling_title">Масштабирование…</string>
+    <string name="rescale_autoscale">Автомасштаб:</string>
+    <string name="rescale_series">Измерение</string>
+
+    <string name="repair_title">Восстановление</string>
+    <string name="repair_text">Необходимо восстановить некоторые измерения. Продолжить?</string>
+    <string name="repairing_title">Восстановление…</string>
+    <string name="repair_series">Измерение</string>
+
+    <string name= "delete_series_title">Хотите удалить это измерение?</string>"
+    <string name= "delete_series_text">Это действие нельзя будет отменить. Продолжить?</string>
+    <string name="tracking_duration">Время измерений</string>
+
+    <string name="service_started_alert_title">Служба запущена</string>
+    <string name="service_started_alert_text">Фоновая служба запущена.\nВы можете закрыть приложение.\nЧтобы вернуться, просто нажмите на иконку приложения.</string>
+
+    <string name="menu_tracking">Измерения</string>
+    <string name="menu_report">Отчёт</string>
+    <string name="menu_archive">Архив</string>
+    <string name="menu_settings">Настройки</string>
+    <string name="menu_delete">Удалить</string>
+    <string name="menu_rescale">Масштабирование</string>
+    <string name="menu_rescale_all">Масштабировать все измерения</string>
+
+    <string name="tracking_start">Начать измерения</string>
+    <string name="tracking_stop">Закончить измерения</string>
+
+    <string name="report_day">День</string>
+    <string name="report_week">Неделя</string>
+    <string name="report_month">Месяц</string>
+    <string name="report_hbr">Пульс(BPM)</string>
+    <string name="report_hypnogram_h">Гипнограмма (ч.)</string>
+    <string name="report_hypnogram_p">Гипнограмма (%)</string>
+
+    <string name="sleep_phase_awake">Awake</string>
+    <string name="sleep_phase_l_sleep">Light Sleep</string>
+    <string name="sleep_phase_d_sleep">Deep Sleep</string>
+    <string name="sleep_phase_rem">REM</string>
+    <string name="loading">Загрузка ...</string>
+</resources>

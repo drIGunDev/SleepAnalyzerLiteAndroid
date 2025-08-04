@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SleepAnalyzer</string>
+    <string name="brand_name">SleepAnalyzer</string>
+
+    <string name="max_hr">max HR: %3.0f</string>
+    <string name="min_hr">min HR: %3.0f</string>
+
+    <string name="min_hr_text">min HR (BPM)</string>
+    <string name="max_hr_text">max HR (BPM)</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="duration">Dauer: %s</string>
+
+    <string name="notification_channel_name">Bluetooth-Sensor-Abfrage für die SleepAnalyzer-App</string>
+    <string name="notification_text">Sleep Analyzer läuft im Hintergrund</string>
+
+    <string name="permissions_not_granted_title">Berechtigungen nicht erteilt</string>
+    <string name="permissions_not_granted_text">Folgende Berechtigungen wurden nicht erteilt:\n%s\n\nDie App kann keine Verbindung mit dem Sensor herstellen.</string>
+
+    <string name="sleep_satisfaction_title">Schlafzufriedenheit</string>
+    <string name="sleep_rating_acquire_text">Bitte bewerten Sie Ihren Schlaf und wählen Sie ein Emoticon aus der Liste aus:</string>
+
+    <string name="select_sensor_title">Sensor auswählen</string>
+    <string name="select_sensor_text">Bitte wählen Sie einen Sensor aus der Liste unten aus:</string>
+
+    <string name="rescale_title">Skalieren</string>
+    <string name="rescaling_title">Skaliere…</string>
+    <string name="rescale_autoscale">Automatische Skalierung:</string>
+    <string name="rescale_series">Skalierte Serie</string>
+
+    <string name="repair_title">Reparieren</string>
+    <string name="repair_text">Einige Messwerte müssen wiederhergestellt werden. Fortfahren?</string>
+    <string name="repairing_title">Repariere…</string>
+    <string name="repair_series">Reparierte Serie</string>
+
+    <string name= "delete_series_title">Möchten Sie diese Serie löschen?</string>
+    <string name= "delete_series_text">Diese Aktion kann nicht rückgängig gemacht werden. Fortfahren?</string>
+
+    <string name="service_started_alert_title">Dienst gestartet</string>
+    <string name="service_started_alert_text">Der Hintergrunddienst wurde gestartet.\nSie können die App schließen.\nZum Zurückkehren tippen Sie einfach auf das App-Symbol.</string>
+
+    <string name="menu_tracking">Tracking</string>
+    <string name="menu_report">Bericht</string>
+    <string name="menu_archive">Archiv</string>
+    <string name="menu_settings">Einstellungen</string>
+    <string name="menu_delete">Löschen</string>
+    <string name="menu_rescale">Neu skalieren</string>
+    <string name="menu_rescale_all">Alles neu skalieren</string>
+
+    <string name="tracking_start">Start Tracking</string>
+    <string name="tracking_stop">Stop Tracking</string>
+    <string name="tracking_duration">Trackingdauer</string>
+
+    <string name="report_day">Tag</string>
+    <string name="report_week">Woche</string>
+    <string name="report_month">Monat</string>
+    <string name="report_hbr">HBR(bpm)</string>
+    <string name="report_hypnogram_h">Hypnogramm (h)</string>
+    <string name="report_hypnogram_p">Hypnogramm (%)</string>
+
+    <string name="sleep_phase_awake">Awake</string>
+    <string name="sleep_phase_l_sleep">Light Sleep</string>
+    <string name="sleep_phase_d_sleep">Deep Sleep</string>
+    <string name="sleep_phase_rem">REM</string>
+    <string name="loading">loading ...</string>
+</resources>

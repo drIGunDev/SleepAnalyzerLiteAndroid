@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.SleepAnalyzer.SplashScreen" parent= "Theme.SplashScreen">
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="windowSplashScreenBackground">@color/splash_screen_background</item>
+        <item name="postSplashScreenTheme">@style/Theme.SleepAnalyzer</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/splash_screen_background</item>
+    </style>
+
+    <style name="Theme.SleepAnalyzer" parent="android:Theme.Material.Light.NoActionBar"/>
+
+</resources>
