@@ -1,8 +1,8 @@
-# SleepAnalyzerLiteIOS
+# SleepAnalyzerLiteAndroid
 
 > 💤 iOS sleep tracking app using real-time heart rate sensors (Polar Verity Sense, Polar OH1+, etc.).
 
-SleepAnalyzerLiteIOS is an open-source app that collects heart rate data during sleep and visualizes hypnograms, sleep phases, and long-term statistics.
+SleepAnalyzerLiteAndroid is an open-source app that collects heart rate data during sleep and visualizes hypnograms, sleep phases, and long-term statistics.
 
 It integrates with BLE sensors from **Polar** to provide detailed insight into sleep architecture and heart performance overnight.
 

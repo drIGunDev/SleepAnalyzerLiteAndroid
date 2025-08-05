@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import kotlin.collections.listOf
 
 plugins {
     alias(libs.plugins.android.application)
@@ -32,6 +31,7 @@ android {
         }
 
         release {
+            applicationIdSuffix = ".lite"
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }

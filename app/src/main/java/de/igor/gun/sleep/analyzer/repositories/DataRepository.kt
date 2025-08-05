@@ -11,8 +11,6 @@ import de.igor.gun.sleep.analyzer.db.entities.toIdWithColor
 import de.igor.gun.sleep.analyzer.db.entities.toMillisSinceStart
 import de.igor.gun.sleep.analyzer.hypnogram.computation.HypnogramComputation
 import de.igor.gun.sleep.analyzer.math.bridges.mapToSleepDataPoint
-//import de.igor.gun.sleep.analyzer.math.computeUniformHypnogram
-//import de.igor.gun.sleep.analyzer.math.segmentation
 import de.igor.gun.sleep.analyzer.misc.AppParameters
 import de.igor.gun.sleep.analyzer.repositories.tools.ChartBuilder
 import de.igor.gun.sleep.analyzer.repositories.tools.HypnogramHolder
@@ -195,11 +193,7 @@ class DataRepository @Inject constructor(
         }
     }
 
-//    private fun computeHRRmse(
-//        measurements: List<Measurement>,
-//        frameSizeHR: Int,
-//        quantizationHR: Float,
-//    ): List<PointF> = segmentation(Measurement.Id.HR, measurements, frameSizeHR, quantizationHR)
+    val hcBinding = HypnogramComputation()
 
     private fun computeHRRmse(
         measurements: List<Measurement>,
@@ -208,15 +202,9 @@ class DataRepository @Inject constructor(
     ): List<PointF> {
         val x = measurements.toMillisSinceStart()
         val y = measurements.mapToValues(Measurement.Id.HR)
-        return HypnogramComputation
+        return hcBinding
             .segmentation(x = x, y = y, frameSizeHR, quantizationHR)
     }
-
-//    private fun computeACC(
-//        measurements: List<Measurement>,
-//        frameSizeACC: Int,
-//        quantizationACC: Float,
-//    ): List<PointF> = segmentation(Measurement.Id.ACC, measurements, frameSizeACC, quantizationACC)
 
     private fun computeACC(
         measurements: List<Measurement>,
@@ -225,22 +213,15 @@ class DataRepository @Inject constructor(
     ): List<PointF> {
         val x = measurements.toMillisSinceStart()
         val y = measurements.mapToValues(Measurement.Id.ACC)
-        return HypnogramComputation
+        return hcBinding
             .segmentation(x = x, y = y, frameSizeACC, quantizationACC)
     }
-
-//    private fun computeUniformHypnogram(
-//        hrRmse: List<PointF>,
-//        accRmse: List<PointF>,
-//    ): List<HypnogramHolder.SleepDataPoint> {
-//        return computeUniformHypnogram(quantizedHR = hrRmse, quantizedACC = accRmse, minimalSleepPhaseLengthMs = 10 * 60 * 1000/*10 min*/)
-//    }
 
     private fun computeUniformHypnogram(
         hrRmse: List<PointF>,
         accRmse: List<PointF>,
     ): List<HypnogramHolder.SleepDataPoint> {
-        return HypnogramComputation
+        return hcBinding
             .computeUniformHypnogram(quantizedHR = hrRmse, quantizedACC = accRmse, minimalSleepPhaseLengthMs = 10 * 60 * 1000)
             .mapToSleepDataPoint()
     }
