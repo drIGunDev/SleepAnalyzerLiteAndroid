@@ -45,7 +45,7 @@ Visual overlays of sleep phase predictions and adjustable quantization parameter
 ## 🛠 Technologies
 - Jetpack Compose UI
 - Dagger Hilt
-- BLE CoreBluetooth integration
+- [Polar BLE SDK](https://github.com/polarofficial/polar-ble-sdk/tree/master)
 - Custom circular hypnogram rendering
 - Binary sleep computation module via `HypnogramComputation.aar`
 
