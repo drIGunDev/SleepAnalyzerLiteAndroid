@@ -12,6 +12,7 @@ import de.igor.gun.sleep.analyzer.db.entities.toMillisSinceStart
 import de.igor.gun.sleep.analyzer.hypnogram.computation.HypnogramComputation
 import de.igor.gun.sleep.analyzer.math.bridges.mapToSleepDataPoint
 import de.igor.gun.sleep.analyzer.misc.AppParameters
+import de.igor.gun.sleep.analyzer.repositories.di.HCProvider
 import de.igor.gun.sleep.analyzer.repositories.tools.ChartBuilder
 import de.igor.gun.sleep.analyzer.repositories.tools.HypnogramHolder
 import de.igor.gun.sleep.analyzer.repositories.tools.SleepPhasesHolder
@@ -30,6 +31,7 @@ import javax.inject.Inject
 class DataRepository @Inject constructor(
     private val dbManager: DBManager,
     private val appParameters: AppParameters,
+    @param:HCProvider private val hcBinding: HypnogramComputation,
 ) {
     private fun getMeasurements(seriesId: Long) = dbManager.getMeasurements(seriesId)
     private fun getEndDateFromMeasurements(seriesId: Long): LocalDateTime? =
@@ -38,7 +40,6 @@ class DataRepository @Inject constructor(
         } catch (e: Exception) {
             null
         }
-
 
     fun fillChartWithMeasurements(
         chartBuilder: ChartBuilder,
@@ -192,8 +193,6 @@ class DataRepository @Inject constructor(
             chartBuilder.addChart(accRMSEChart)
         }
     }
-
-    val hcBinding = HypnogramComputation()
 
     private fun computeHRRmse(
         measurements: List<Measurement>,

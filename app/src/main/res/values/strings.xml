@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SleepAnalyzer</string>
+    <string name="app_name">SleepAnalyzerLite</string>
     <string name="brand_name">SleepAnalyzer</string>
 
     <string name="max_hr">max HR: %3.0f</string>
