@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleStartEffect
-import androidx.navigation.NavHostController
 import de.igor.gun.sleep.analyzer.db.entities.Measurement
 import de.igor.gun.sleep.analyzer.misc.formatToString
 import de.igor.gun.sleep.analyzer.ui.misc.ShowProgressBar
@@ -38,10 +37,9 @@ data class Detail(val seriesId: Long)
 
 @Composable
 fun ArchiveDetailScreen(
-    navController: NavHostController,
     seriesId: Long,
 ) {
-    val viewModel = navController.viewModel<ArchiveListViewModel>() ?: return
+    val viewModel = viewModel<ArchiveListViewModel>()
 
     val textFieldStyle = MaterialTheme.typography.labelSmall
     val appSettings = viewModel.appParametersLive

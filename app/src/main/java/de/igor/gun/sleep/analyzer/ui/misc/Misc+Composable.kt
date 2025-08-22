@@ -17,9 +17,8 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import de.igor.gun.sleep.analyzer.ui.navigation.RootGraph
+import timber.log.Timber
 
-
-fun NavBackStackEntry.destinationSimpleName(): String? = destination.route?.split(".")?.last()
 
 @Composable
 internal inline fun <reified T : RootGraph> NavHostController.isRouteInDestination(): Boolean {
@@ -28,11 +27,9 @@ internal inline fun <reified T : RootGraph> NavHostController.isRouteInDestinati
 }
 
 @Composable
-inline fun <reified T : ViewModel> NavHostController.viewModel(): T? {
-    val navBackStackEntry by this.currentBackStackEntryAsState()
-    return navBackStackEntry
-        ?.let { hiltViewModel<T>(it, key = T::class.java.name) }
-//        .also { Timber.w("viewModel<${T::class.java.simpleName}>$it") }
+inline fun <reified T : ViewModel> viewModel(): T {
+    return hiltViewModel<T>(key = T::class.java.name)
+        .also { Timber.w("${T::class.java.simpleName} --> $it") }
 }
 
 @Composable
@@ -50,3 +47,6 @@ fun ShowProgressBar() {
         LinearProgressIndicator(modifier = Modifier.padding(top = 50.dp, bottom = 10.dp))
     }
 }
+
+fun NavBackStackEntry.destinationSimpleName(): String? = destination.route?.split(".")?.last()
+

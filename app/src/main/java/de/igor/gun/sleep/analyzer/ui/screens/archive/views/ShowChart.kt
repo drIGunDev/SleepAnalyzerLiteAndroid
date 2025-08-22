@@ -13,6 +13,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import de.igor.gun.sleep.analyzer.repositories.tools.ChartBuilder
+import de.igor.gun.sleep.analyzer.ui.misc.viewModel
 import de.igor.gun.sleep.analyzer.ui.screens.archive.detail.Detail
 import de.igor.gun.sleep.analyzer.ui.screens.archive.model.ArchiveListViewModel
 import de.igor.gun.sleep.analyzer.ui.screens.archive.model.SeriesWrapper
@@ -23,8 +24,8 @@ import de.igor.gun.sleep.analyzer.ui.tools.chart.Chart
 fun ShowChart(
     navController: NavHostController,
     item: SeriesWrapper,
-    viewModel: ArchiveListViewModel,
 ) {
+    val viewModel = viewModel<ArchiveListViewModel>()
     val chartBuilderState = remember { mutableStateOf<ChartBuilder?>(null) }
     LaunchedEffect(chartBuilderState) {
         when (item) {

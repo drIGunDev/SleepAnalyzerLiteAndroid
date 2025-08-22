@@ -33,6 +33,7 @@ import de.igor.gun.sleep.analyzer.misc.millisToDurationCompact
 import de.igor.gun.sleep.analyzer.misc.millisToDurationFull
 import de.igor.gun.sleep.analyzer.ui.misc.formatDuration
 import de.igor.gun.sleep.analyzer.ui.misc.formatHR
+import de.igor.gun.sleep.analyzer.ui.misc.viewModel
 import de.igor.gun.sleep.analyzer.ui.screens.archive.model.ArchiveListViewModel
 import de.igor.gun.sleep.analyzer.ui.screens.archive.model.SeriesWrapper
 import de.igor.gun.sleep.analyzer.ui.theme.AWAKEColor
@@ -43,15 +44,15 @@ import de.igor.gun.sleep.analyzer.ui.theme.REMColor
 
 
 @Composable
-internal fun LazyItemScope.ShowSeriesItem(
+fun LazyItemScope.ShowSeriesItem(
     series: Series,
     navController: NavHostController,
-    viewModel: ArchiveListViewModel,
     isFirst: Boolean,
     onDelete: (Series) -> Unit,
     onRescale: (Series, Boolean, Float?, Int, Int) -> Unit,
     onRescaleCompleted: () -> Unit,
 ) {
+    val viewModel = viewModel<ArchiveListViewModel>()
     val shouldDisplayMenu = rememberSaveable { mutableStateOf(false) }
     val showDeleteSeriesAlert = rememberSaveable { mutableStateOf(false) }
     val shouldShowRescaleDialog = rememberSaveable { mutableStateOf(false) }
@@ -87,7 +88,6 @@ internal fun LazyItemScope.ShowSeriesItem(
             ShowHeader(
                 series = series,
                 item = item,
-                listViewModel = viewModel,
                 isFirst = isFirst,
                 shouldDisplayMenu = shouldDisplayMenu,
                 showDeleteSeriesAlert = showDeleteSeriesAlert,
@@ -99,8 +99,7 @@ internal fun LazyItemScope.ShowSeriesItem(
             )
             ShowSeries(
                 item = item,
-                navController = navController,
-                viewModel = viewModel
+                navController = navController
             )
         }
     }
@@ -109,10 +108,8 @@ internal fun LazyItemScope.ShowSeriesItem(
 @Composable
 private fun ShowSeries(
     item: SeriesWrapper,
-    navController: NavHostController,
-    viewModel: ArchiveListViewModel
+    navController: NavHostController
 ) {
-
     val description = createDescription(item = item)
 
     when (item) {
@@ -125,7 +122,6 @@ private fun ShowSeries(
         is SeriesWrapper.Measurements -> ShowMeasurements(
             item = item,
             navController = navController,
-            listViewModel = viewModel,
             description = description
         )
     }
@@ -135,13 +131,11 @@ private fun ShowSeries(
 private fun ShowMeasurements(
     item: SeriesWrapper.Measurements,
     navController: NavHostController,
-    listViewModel: ArchiveListViewModel,
     description: String
 ) {
     ShowChart(
         navController = navController,
         item = item,
-        viewModel = listViewModel,
     )
     Text(
         text = description,
@@ -191,7 +185,6 @@ private fun createDescription(item: SeriesWrapper): String {
 private fun ShowHeader(
     series: Series,
     item: SeriesWrapper,
-    listViewModel: ArchiveListViewModel,
     isFirst: Boolean,
     shouldDisplayMenu: MutableState<Boolean>,
     showDeleteSeriesAlert: MutableState<Boolean>,
@@ -200,7 +193,10 @@ private fun ShowHeader(
     onDelete: (Series) -> Unit,
     onRescale: (Series, Boolean, Float?, Int, Int) -> Unit,
     onRescaleCompleted: () -> Unit,
-) {
+
+    ) {
+    val viewModel = viewModel<ArchiveListViewModel>()
+
     ShowDialogs(
         item = item,
         shouldShowRescaleDialog = shouldShowRescaleDialog,
@@ -224,7 +220,7 @@ private fun ShowHeader(
             ShowItemTitle(item = item)
         }
 
-        val hasMenu = !(isFirst && listViewModel.isRecording.value && item is SeriesWrapper.Measurements)
+        val hasMenu = !(isFirst && viewModel.isRecording.value && item is SeriesWrapper.Measurements)
         if (hasMenu) {
             Column(modifier = Modifier.weight(1f)) {
                 ShowMenu(

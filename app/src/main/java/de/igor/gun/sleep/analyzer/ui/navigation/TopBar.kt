@@ -12,8 +12,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import de.igor.gun.sleep.analyzer.R
-import de.igor.gun.sleep.analyzer.ui.misc.viewModel
-import de.igor.gun.sleep.analyzer.ui.screens.archive.model.ArchiveListViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,7 +20,6 @@ fun TopBar(
     navController: NavHostController,
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val viewModel = navController.viewModel<ArchiveListViewModel>() ?: return
 
     TopAppBar(
         title = { Text(stringResource(R.string.brand_name)) },
@@ -36,7 +33,6 @@ fun TopBar(
         actions = {
             ShowMenu(
                 navController = navController,
-                viewModel = viewModel
             )
         }
     )

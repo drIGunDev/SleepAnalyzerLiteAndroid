@@ -13,12 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import de.igor.gun.sleep.analyzer.db.entities.toSatisfaction
 import de.igor.gun.sleep.analyzer.misc.toLocalDateTime
 import de.igor.gun.sleep.analyzer.repositories.tools.SleepPhasesHolder
+import de.igor.gun.sleep.analyzer.ui.misc.viewModel
 import de.igor.gun.sleep.analyzer.ui.screens.tracking.model.SensorViewModel
 import de.igor.gun.sleep.analyzer.ui.screens.tracking.model.ServiceViewModel
 import de.igor.gun.sleep.analyzer.ui.screens.tracking.model.TrackingViewModel
@@ -39,7 +39,7 @@ fun TrackingTab(
     serviceViewModel: ServiceViewModel,
     sensorViewModel: SensorViewModel,
 ) {
-    val gathererViewModel = hiltViewModel<TrackingViewModel>()
+    val gathererViewModel = viewModel<TrackingViewModel>()
     val stopRecordingShowSatisfactionDialog = rememberSaveable { mutableStateOf(false) }
     val startRecordingShowAlert = rememberSaveable { mutableStateOf(false) }
     val showRecoveryDialog = gathererViewModel.isDataInconsistent

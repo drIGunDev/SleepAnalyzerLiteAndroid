@@ -26,7 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
-import androidx.navigation.NavHostController
 import de.igor.gun.sleep.analyzer.R
 import de.igor.gun.sleep.analyzer.repositories.tools.CalendarChartHolder
 import de.igor.gun.sleep.analyzer.ui.misc.ShowProgressBar
@@ -41,8 +40,8 @@ import de.igor.gun.sleep.analyzer.ui.tools.calendar.CalendarChart
 
 
 @Composable
-fun ReportTab(navController: NavHostController) {
-    val viewModel = navController.viewModel<ReportViewModel>() ?: return
+fun ReportTab() {
+    val viewModel = viewModel<ReportViewModel>()
 
     val hbrHolder by viewModel.hbrHolder
     val hypnogramHolder by viewModel.hypnogramHolder

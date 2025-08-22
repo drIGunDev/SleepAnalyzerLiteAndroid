@@ -20,8 +20,8 @@ import de.igor.gun.sleep.analyzer.R
 fun ShowDeleteItemAlert(
     shouldShowDeleteSeriesAlert: MutableState<Boolean> = mutableStateOf(true),
     onDismissDialog: () -> Unit = { shouldShowDeleteSeriesAlert.value = false },
-    confirmAction: () -> Unit = {},
-    cancelAction: () -> Unit = {},
+    onDeleteItem: () -> Unit = {},
+    onCancel: () -> Unit = {},
 ) {
     if (shouldShowDeleteSeriesAlert.value) {
         AlertDialog(
@@ -44,7 +44,7 @@ fun ShowDeleteItemAlert(
             confirmButton = {
                 TextButton(onClick = {
                     onDismissDialog()
-                    confirmAction()
+                    onDeleteItem()
                 }) {
                     Text(stringResource(R.string.ok))
                 }
@@ -52,7 +52,7 @@ fun ShowDeleteItemAlert(
             dismissButton = {
                 TextButton(onClick = {
                     onDismissDialog()
-                    cancelAction()
+                    onCancel()
                 }) {
                     Text(stringResource(R.string.cancel))
                 }

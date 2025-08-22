@@ -80,6 +80,6 @@ fun ShowDialogs(
 
     ShowDeleteItemAlert(
         shouldShowDeleteSeriesAlert = showDeleteSeriesAlert,
-        confirmAction = { onDelete(item.series) }
+        onDeleteItem = { onDelete(item.series) }
     )
 }

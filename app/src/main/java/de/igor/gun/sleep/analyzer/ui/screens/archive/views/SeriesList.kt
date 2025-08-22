@@ -17,8 +17,8 @@ import de.igor.gun.sleep.analyzer.ui.screens.archive.model.ArchiveListViewModel
 
 
 @Composable
-internal fun ShowSeriesList(navController: NavHostController) {
-    val viewModel = navController.viewModel<ArchiveListViewModel>() ?: return
+fun ShowSeriesList(navController: NavHostController) {
+    val viewModel = viewModel<ArchiveListViewModel>()
     val listState = rememberLazyListState()
 
     val seriesList = viewModel.seriesList
@@ -50,7 +50,6 @@ internal fun ShowSeriesList(navController: NavHostController) {
                 ShowSeriesItem(
                     series = item,
                     navController = navController,
-                    viewModel = viewModel,
                     isFirst = item == firstItem,
                     onDelete = { series -> viewModel.deleteSeries(series) },
                     onRescale = { series, autoScale, duration, minHR, maxHR ->

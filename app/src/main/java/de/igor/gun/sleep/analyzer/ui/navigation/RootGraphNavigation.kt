@@ -40,12 +40,18 @@ fun RootGraphNavigation(
                     sensorViewModel = sensorViewModel,
                 )
             }
-            composable<RootGraph.Report> { ReportTab(navController) }
-            composable<RootGraph.Archive> { ArchivePreviewTab(navController) }
-            composable<RootGraph.Settings> { SettingsTab(navController) }
+            composable<RootGraph.Report> {
+                ReportTab()
+            }
+            composable<RootGraph.Archive> {
+                ArchivePreviewTab(navController)
+            }
+            composable<RootGraph.Settings> {
+                SettingsTab(navController)
+            }
             composable<Detail> {
                 val detail = it.toRoute<Detail>()
-                ArchiveDetailScreen(navController, detail.seriesId)
+                ArchiveDetailScreen(detail.seriesId)
             }
         }
     }

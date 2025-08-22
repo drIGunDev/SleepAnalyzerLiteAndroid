@@ -18,6 +18,7 @@ import androidx.navigation.NavHostController
 import de.igor.gun.sleep.analyzer.R
 import de.igor.gun.sleep.analyzer.misc.durationToMillis
 import de.igor.gun.sleep.analyzer.ui.misc.isRouteInDestination
+import de.igor.gun.sleep.analyzer.ui.misc.viewModel
 import de.igor.gun.sleep.analyzer.ui.screens.archive.model.ArchiveListViewModel
 import de.igor.gun.sleep.analyzer.ui.screens.archive.views.ShowHRScaleDialog
 import de.igor.gun.sleep.analyzer.ui.screens.archive.views.ShowHRScaleProgressDialog
@@ -26,8 +27,9 @@ import de.igor.gun.sleep.analyzer.ui.screens.archive.views.ShowHRScaleProgressDi
 @Composable
 fun RowScope.ShowMenu(
     navController: NavHostController,
-    viewModel: ArchiveListViewModel,
 ) {
+    val viewModel = viewModel<ArchiveListViewModel>()
+
     val shouldShowMainMenu = rememberSaveable { mutableStateOf(false) }
     if (!navController.isRouteInDestination<RootGraph.Archive>()) return
 
@@ -64,10 +66,12 @@ fun RowScope.ShowMenu(
         rescaleState = viewModel.rescalingSate,
         onRescaleCompleted = {
             viewModel.updatePreviewList()
+            navController.navigate(RootGraph.Archive)
         },
         onCanceled = {
             viewModel.stopHRRescaling()
             viewModel.updatePreviewList()
+            navController.navigate(RootGraph.Archive)
         }
     )
 }
