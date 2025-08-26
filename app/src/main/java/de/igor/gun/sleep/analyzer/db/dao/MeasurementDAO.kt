@@ -28,9 +28,9 @@ interface MeasurementDAO {
     @Query("select count(id) from measurement where series_id = :seriesId")
     fun getMeasurementCountAsFlow(seriesId: Long?): Flow<Long>
 
-    @Query("select min(hr) from measurement where series_id = :seriesId")
+    @Query("select min(hr) from measurement where series_id = :seriesId and hr > 0")
     fun getMinHR(seriesId: Long): Float?
 
-    @Query("select max(hr) from measurement where series_id = :seriesId")
+    @Query("select max(hr) from measurement where series_id = :seriesId and hr > 0")
     fun getMaxHR(seriesId: Long): Float?
 }
