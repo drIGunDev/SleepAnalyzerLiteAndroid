@@ -28,7 +28,7 @@ import javax.inject.Inject
 sealed class SeriesWrapper(val series: Series) {
     class Measurements(series: Series, val measurements: List<Measurement>) : SeriesWrapper(series)
     class Cached(series: Series, val cache: Cache) : SeriesWrapper(series) {
-        fun isValidHypnogram(): Boolean = cache.awake > 0 || cache.lSeep > 0 || cache.dSleep > 0 || cache.rem > 0
+        fun isValidHypnogram(): Boolean = cache.awake > 0 || cache.lSleep > 0 || cache.dSleep > 0 || cache.rem > 0
     }
 }
 

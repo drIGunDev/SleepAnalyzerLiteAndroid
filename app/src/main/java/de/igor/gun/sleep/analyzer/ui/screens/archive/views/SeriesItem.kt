@@ -282,7 +282,7 @@ private fun ShowSleepPhases(item: SeriesWrapper.Cached) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 val lowSleepText = stringResource(R.string.sleep_phase_l_sleep)
                 Text(text = lowSleepText, style = MaterialTheme.typography.bodySmall, color = LSLEEPColor)
-                Text(text = millisToDurationCompact(item.cache.lSeep), style = MaterialTheme.typography.bodySmall, color = LSLEEPColor)
+                Text(text = millisToDurationCompact(item.cache.lSleep), style = MaterialTheme.typography.bodySmall, color = LSLEEPColor)
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 val deepSleepText = stringResource(R.string.sleep_phase_d_sleep)

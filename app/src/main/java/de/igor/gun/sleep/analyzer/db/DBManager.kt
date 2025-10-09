@@ -113,7 +113,7 @@ class DBManager(private val appDatabase: AppDatabase) {
                             chartImage = chartBitmap,
                             awake = hypnogram?.absolutMillis?.get(HypnogramHolder.SleepState.AWAKE) ?: 0f,
                             rem = hypnogram?.absolutMillis?.get(HypnogramHolder.SleepState.REM) ?: 0f,
-                            lSeep = hypnogram?.absolutMillis?.get(HypnogramHolder.SleepState.LIGHT_SLEEP) ?: 0f,
+                            lSleep = hypnogram?.absolutMillis?.get(HypnogramHolder.SleepState.LIGHT_SLEEP) ?: 0f,
                             dSleep = hypnogram?.absolutMillis?.get(HypnogramHolder.SleepState.DEEP_SLEEP) ?: 0f,
                             seriesId = series.id,
                         )
@@ -128,7 +128,7 @@ class DBManager(private val appDatabase: AppDatabase) {
                     if (hypnogram != null) {
                         savedCache.awake = hypnogram.absolutMillis.get(HypnogramHolder.SleepState.AWAKE) ?: 0f
                         savedCache.rem = hypnogram.absolutMillis.get(HypnogramHolder.SleepState.REM) ?: 0f
-                        savedCache.lSeep = hypnogram.absolutMillis.get(HypnogramHolder.SleepState.LIGHT_SLEEP) ?: 0f
+                        savedCache.lSleep = hypnogram.absolutMillis.get(HypnogramHolder.SleepState.LIGHT_SLEEP) ?: 0f
                         savedCache.dSleep = hypnogram.absolutMillis.get(HypnogramHolder.SleepState.DEEP_SLEEP) ?: 0f
                     }
                     appDatabase.cacheDAO().update(savedCache)
@@ -143,7 +143,7 @@ class DBManager(private val appDatabase: AppDatabase) {
             if (savedCache != null) {
                 savedCache.awake = hypnogram.absolutMillis[HypnogramHolder.SleepState.AWAKE] ?: 0f
                 savedCache.rem = hypnogram.absolutMillis[HypnogramHolder.SleepState.REM] ?: 0f
-                savedCache.lSeep = hypnogram.absolutMillis[HypnogramHolder.SleepState.LIGHT_SLEEP] ?: 0f
+                savedCache.lSleep = hypnogram.absolutMillis[HypnogramHolder.SleepState.LIGHT_SLEEP] ?: 0f
                 savedCache.dSleep = hypnogram.absolutMillis[HypnogramHolder.SleepState.DEEP_SLEEP] ?: 0f
                 appDatabase.cacheDAO().update(savedCache)
             }

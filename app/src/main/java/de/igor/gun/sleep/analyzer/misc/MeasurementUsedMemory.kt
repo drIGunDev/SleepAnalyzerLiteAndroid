@@ -34,13 +34,13 @@ fun ShowUsedMemory(
     @SuppressLint("DefaultLocale")
     fun Long.memoryToString(): String {
         return if (this < 1024) {
-            "$this B."
+            "$this B"
         } else if (this < 1024 * 1024) {
-            "${this / 1024} kB."
+            "${this / 1024} KB"
         } else if (this < 1024 * 1024 * 1024) {
-            "${this/ (1024 * 1024)} mB."
+            "${this/ (1024 * 1024)} MB"
         } else {
-            "${String.format("%.3f", this.toDouble() / (1024 * 1024 * 1024))} gB."
+            "${String.format("%.3f", this.toDouble() / (1024 * 1024 * 1024))} GB"
         }
     }
 

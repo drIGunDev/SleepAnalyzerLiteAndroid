@@ -43,3 +43,9 @@ val MIGRATION_4_5: Migration = object : Migration(4, 5) {
         db.execSQL("ALTER TABLE 'Cache' ADD COLUMN 'd_sleep' REAL NOT NULL DEFAULT 0.0;")
     }
 }
+
+val MIGRATION_5_6: Migration = object : Migration(5, 6) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE 'Cache' RENAME COLUMN 'l_seep' TO 'l_sleep';")
+    }
+}

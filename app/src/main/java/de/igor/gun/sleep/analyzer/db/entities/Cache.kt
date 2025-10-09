@@ -33,7 +33,7 @@ class Cache(
     @ColumnInfo(name = "chart_image") var chartImage: Bitmap,
     @ColumnInfo(name = "awake") var awake: Float,
     @ColumnInfo(name = "rem") var rem: Float,
-    @ColumnInfo(name = "l_seep") var lSeep: Float,
+    @ColumnInfo(name = "l_sleep") var lSleep: Float,
     @ColumnInfo(name = "d_sleep") var dSleep: Float,
     @ColumnInfo(name = "series_id") var seriesId: Long,
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
@@ -43,7 +43,7 @@ fun Cache.toSleepStateDistribution(): HypnogramHolder.SleepStateDistribution =
     HypnogramHolder.SleepStateDistribution(
         mapOf(
             HypnogramHolder.SleepState.AWAKE to awake,
-            HypnogramHolder.SleepState.LIGHT_SLEEP to lSeep,
+            HypnogramHolder.SleepState.LIGHT_SLEEP to lSleep,
             HypnogramHolder.SleepState.DEEP_SLEEP to dSleep,
             HypnogramHolder.SleepState.REM to rem
         )
