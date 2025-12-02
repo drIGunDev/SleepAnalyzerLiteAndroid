@@ -41,6 +41,12 @@ Visual overlays of sleep phase predictions and adjustable quantization parameter
 </div>
 
 ---
+## ⚙️ Installation
+- Install the [Obtainium app](https://github.com/ImranR98/Obtainium)
+- Add the app via the link of this repository
+- You can install and update the app via [Obtainium app](https://github.com/ImranR98/Obtainium)
+
+---
 
 ## 🛠 Technologies
 - Jetpack Compose UI
