@@ -7,6 +7,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import de.igor.gun.sleep.analyzer.repositories.tools.HypnogramHolder
+import de.igor.gun.sleep.analyzer.repositories.tools.SleepStateDistribution
 
 
 @Entity(
@@ -39,8 +40,8 @@ class Cache(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
 )
 
-fun Cache.toSleepStateDistribution(): HypnogramHolder.SleepStateDistribution =
-    HypnogramHolder.SleepStateDistribution(
+fun Cache.toSleepStateDistribution(): SleepStateDistribution =
+    SleepStateDistribution(
         mapOf(
             HypnogramHolder.SleepState.AWAKE to awake,
             HypnogramHolder.SleepState.LIGHT_SLEEP to lSleep,

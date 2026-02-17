@@ -1,8 +1,11 @@
 package de.igor.gun.sleep.analyzer.math.bridges
 
-import de.igor.gun.sleep.analyzer.hypnogram.computation.HCSleepDataPoint
-import de.igor.gun.sleep.analyzer.hypnogram.computation.HCSleepState
+// Bridge: HCSleepState <-> SleepState (app-level type)
+// Uncomment when SleepState is available from the app module.
+
+import de.igor.gun.sleep.analyzer.hypnogram.computation.v2.classes.HCSleepState
 import de.igor.gun.sleep.analyzer.repositories.tools.HypnogramHolder
+
 
 fun HCSleepState.toSleepState(): HypnogramHolder.SleepState = when (this) {
     HCSleepState.AWAKE -> HypnogramHolder.SleepState.AWAKE
@@ -10,7 +13,3 @@ fun HCSleepState.toSleepState(): HypnogramHolder.SleepState = when (this) {
     HCSleepState.DEEP_SLEEP -> HypnogramHolder.SleepState.DEEP_SLEEP
     HCSleepState.REM -> HypnogramHolder.SleepState.REM
 }
-
-fun HCSleepDataPoint.toSleepDataPoint(): HypnogramHolder.SleepDataPoint = HypnogramHolder.SleepDataPoint(time = time, state = state.toSleepState())
-
-fun List<HCSleepDataPoint>.mapToSleepDataPoint(): List<HypnogramHolder.SleepDataPoint> = map { it.toSleepDataPoint() }

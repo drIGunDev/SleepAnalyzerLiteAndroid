@@ -48,7 +48,7 @@ data class Measurement(
 }
 
 fun List<Measurement.Id>.toIdWithColor(): List<Pair<Measurement.Id, Int>> =
-    this.map{
+    this.map {
         when (it) {
             Measurement.Id.HR -> Pair(Measurement.Id.HR, Red.toArgb())
             Measurement.Id.ACC -> Pair(Measurement.Id.ACC, Green.toArgb())
@@ -70,7 +70,7 @@ fun List<Measurement>.toChart(
             }
         }
         for (measurement in this) {
-            val duration = Duration.between(this[0].date, measurement.date).toMillis().toFloat()
+            val duration = Duration.between(this.first().date, measurement.date).toMillis().toFloat()
             for (item in idWithColor) {
                 when (item.first) {
                     Measurement.Id.HR -> channels[Measurement.Id.HR]?.first?.add(PointF(duration, measurement.hr.toFloat()))
@@ -95,17 +95,3 @@ fun List<Measurement>.toChart(
         }
     }
 }
-
-fun List<Measurement>.toMillisSinceStart(): List<Float> =
-    map { Duration.between(this[0].date, it.date).toMillis().toFloat() }
-
-fun List<Measurement>.mapToValues(id: Measurement.Id): List<Float> =
-    map {
-        when (id) {
-            Measurement.Id.HR -> it.hr.toFloat()
-            Measurement.Id.ACC -> it.acc.toFloat()
-            Measurement.Id.GYRO -> it.gyro.toFloat()
-            Measurement.Id.BATTERY -> it.batteryLevel.toFloat()
-            Measurement.Id.RSSI -> it.rssiLevel.toFloat()
-        }
-    }

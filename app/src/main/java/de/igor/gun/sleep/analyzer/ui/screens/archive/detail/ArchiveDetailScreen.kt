@@ -81,7 +81,7 @@ fun ArchiveDetailScreen(
 
     LifecycleStartEffect(Unit) {
         viewModel.requestAppParameters()
-        if (hypnogramBuilder.value.sleepDataPoints.isEmpty()) {
+        if (hypnogramBuilder.value.isEmpty()) {
             requestChart()
         }
         onStopOrDispose {
@@ -90,7 +90,7 @@ fun ArchiveDetailScreen(
         }
     }
 
-    if (hypnogramBuilder.value.sleepDataPoints.isEmpty()) {
+    if (hypnogramBuilder.value.isEmpty()) {
         ShowProgressBar()
         return
     }
@@ -164,16 +164,6 @@ fun ArchiveDetailScreen(
             onValueChange = { appSettings.value.frameSizeHR = it.toInt() },
             onValueChangeFinished = { requestChart() }
         )
-        Text(text = "Frame size ACC: ${appSettings.value.frameSizeACC}", style = textFieldStyle)
-        Slider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 50.dp, end = 50.dp),
-            value = appSettings.value.frameSizeACC.toFloat(),
-            valueRange = 10f..1000f,
-            onValueChange = { appSettings.value.frameSizeACC = it.toInt() },
-            onValueChangeFinished = { requestChart() }
-        )
         Text(text = "Quantization HR: ${appSettings.value.quantizationHR}", style = textFieldStyle)
         Slider(
             modifier = Modifier
@@ -182,6 +172,16 @@ fun ArchiveDetailScreen(
             value = appSettings.value.quantizationHR,
             valueRange = 0f..1f,
             onValueChange = { appSettings.value.quantizationHR = it },
+            onValueChangeFinished = { requestChart() }
+        )
+        Text(text = "Frame size ACC: ${appSettings.value.frameSizeACC}", style = textFieldStyle)
+        Slider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 50.dp, end = 50.dp),
+            value = appSettings.value.frameSizeACC.toFloat(),
+            valueRange = 10f..1000f,
+            onValueChange = { appSettings.value.frameSizeACC = it.toInt() },
             onValueChangeFinished = { requestChart() }
         )
         Text(text = "Quantization ACC: ${appSettings.value.quantizationACC}", style = textFieldStyle)

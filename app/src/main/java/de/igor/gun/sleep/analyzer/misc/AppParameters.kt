@@ -4,6 +4,7 @@ import android.content.Context
 import de.igor.gun.sleep.analyzer.BuildConfig
 import de.igor.gun.sleep.analyzer.db.entities.Measurement
 
+
 class AppParameters(
     val context: Context
 ) {
@@ -35,6 +36,11 @@ class AppParameters(
                 listOf(Measurement.Id.HR, Measurement.Id.ACC, Measurement.Id.GYRO, Measurement.Id.RSSI)
             else
                 listOf(Measurement.Id.HR)
+
+    val minSignificantIntervalSec: Double = 60.0
+    val minAwakeDurationSec: Double = 10 * 60.0
+    val hrHiPassCutoff: Double = 80.0
+    val accHiPassCutoff: Double = 700.0
 
     enum class AppEntryPoints {
         TRACKING, ARCHIVE, ARCHIVE_DETAIL

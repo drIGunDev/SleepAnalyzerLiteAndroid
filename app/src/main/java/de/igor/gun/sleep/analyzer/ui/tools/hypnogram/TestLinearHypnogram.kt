@@ -12,29 +12,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.igor.gun.sleep.analyzer.repositories.tools.HypnogramHolder
-import de.igor.gun.sleep.analyzer.repositories.tools.HypnogramHolder.SleepDataPoint
+import de.igor.gun.sleep.analyzer.repositories.tools.SleepSegment
 import de.igor.gun.sleep.analyzer.ui.theme.MainBackgroundColor
+import timber.log.Timber
 
 
 @Composable
 @Preview(showBackground = true)
 fun UseHypnogram() {
-    val hour = 1000 * 60 * 60L
+    val hour = 60 * 60L
+    fun duration(durationHours: Long) = durationHours * hour
+    fun time(timeHours: Long) = timeHours * hour * 1000
     val sleepDataPoints = listOf(
-        SleepDataPoint(0, HypnogramHolder.SleepState.AWAKE),
-        SleepDataPoint(1 * hour, HypnogramHolder.SleepState.AWAKE),
-        SleepDataPoint(1 * hour, HypnogramHolder.SleepState.AWAKE),
-        SleepDataPoint(1 * hour, HypnogramHolder.SleepState.LIGHT_SLEEP),
-        SleepDataPoint(2 * hour, HypnogramHolder.SleepState.LIGHT_SLEEP),
-        SleepDataPoint(2 * hour, HypnogramHolder.SleepState.LIGHT_SLEEP),
-        SleepDataPoint(2 * hour, HypnogramHolder.SleepState.DEEP_SLEEP),
-        SleepDataPoint(2 * hour, HypnogramHolder.SleepState.DEEP_SLEEP),
-        SleepDataPoint(3 * hour, HypnogramHolder.SleepState.DEEP_SLEEP),
-        SleepDataPoint(3 * hour, HypnogramHolder.SleepState.DEEP_SLEEP),
-        SleepDataPoint(3 * hour, HypnogramHolder.SleepState.REM),
-        SleepDataPoint(4 * hour, HypnogramHolder.SleepState.REM),
-        SleepDataPoint(4 * hour, HypnogramHolder.SleepState.REM),
+        SleepSegment(time(0), duration(1), HypnogramHolder.SleepState.AWAKE),
+        SleepSegment(time(1), duration(1), HypnogramHolder.SleepState.LIGHT_SLEEP),
+        SleepSegment(time(2), duration(2), HypnogramHolder.SleepState.DEEP_SLEEP),
+        SleepSegment(time(4), duration(1), HypnogramHolder.SleepState.REM),
+        SleepSegment(time(5), duration(1), HypnogramHolder.SleepState.AWAKE),
     )
+    Timber.d("sleepDataPoints: $sleepDataPoints")
     MaterialTheme {
         Box(
             modifier = Modifier
@@ -47,7 +43,9 @@ fun UseHypnogram() {
                     .padding(start = 30.dp, end = 30.dp)
                     .fillMaxWidth()
                     .height(200.dp),
-                builder = HypnogramHolder().apply { setUniformSleepDataPoints(sleepDataPoints) }
+                builder = HypnogramHolder().apply {
+                    setSleepSegments(sleepDataPoints)
+                }
             )
         }
     }

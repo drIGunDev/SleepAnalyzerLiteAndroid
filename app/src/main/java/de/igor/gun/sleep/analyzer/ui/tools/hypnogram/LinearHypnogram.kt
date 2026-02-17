@@ -19,7 +19,6 @@ import de.igor.gun.sleep.analyzer.R
 import de.igor.gun.sleep.analyzer.misc.millisToDurationCompact
 import de.igor.gun.sleep.analyzer.repositories.tools.HypnogramHolder
 import de.igor.gun.sleep.analyzer.repositories.tools.computeDistribution
-import de.igor.gun.sleep.analyzer.repositories.tools.toSegments
 
 
 @Composable
@@ -28,8 +27,7 @@ fun LinearHypnogram(
     builder: HypnogramHolder,
 ) {
     val distribution = builder
-        .buildSleepDataPoints()
-        .toSegments()
+        .buildSleepSegments()
         .computeDistribution()
 
     if (!distribution.isValid) return

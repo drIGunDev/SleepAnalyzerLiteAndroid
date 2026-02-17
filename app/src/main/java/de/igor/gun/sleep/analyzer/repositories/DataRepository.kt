@@ -5,19 +5,22 @@ import androidx.compose.ui.graphics.toArgb
 import de.igor.gun.sleep.analyzer.db.DBManager
 import de.igor.gun.sleep.analyzer.db.entities.Measurement
 import de.igor.gun.sleep.analyzer.db.entities.Series
-import de.igor.gun.sleep.analyzer.db.entities.mapToValues
 import de.igor.gun.sleep.analyzer.db.entities.toChart
 import de.igor.gun.sleep.analyzer.db.entities.toIdWithColor
-import de.igor.gun.sleep.analyzer.db.entities.toMillisSinceStart
-import de.igor.gun.sleep.analyzer.hypnogram.computation.HypnogramComputation
-import de.igor.gun.sleep.analyzer.math.bridges.mapToSleepDataPoint
+import de.igor.gun.sleep.analyzer.hypnogram.computation.v2.HypnogramComputation
+import de.igor.gun.sleep.analyzer.hypnogram.computation.v2.classes.mean
+import de.igor.gun.sleep.analyzer.hypnogram.computation.v2.classes.normalize
+import de.igor.gun.sleep.analyzer.hypnogram.computation.v2.classes.rmse
+import de.igor.gun.sleep.analyzer.math.bridges.hcSleepPhase2Segments
+import de.igor.gun.sleep.analyzer.math.bridges.toHCModelConfigurationParams
+import de.igor.gun.sleep.analyzer.math.bridges.toHCPoint
+import de.igor.gun.sleep.analyzer.math.bridges.toPointFs
 import de.igor.gun.sleep.analyzer.misc.AppParameters
 import de.igor.gun.sleep.analyzer.repositories.di.HCProvider
 import de.igor.gun.sleep.analyzer.repositories.tools.ChartBuilder
 import de.igor.gun.sleep.analyzer.repositories.tools.HypnogramHolder
-import de.igor.gun.sleep.analyzer.repositories.tools.SleepPhasesHolder
+import de.igor.gun.sleep.analyzer.repositories.tools.SleepSegment
 import de.igor.gun.sleep.analyzer.repositories.tools.computeDistribution
-import de.igor.gun.sleep.analyzer.repositories.tools.toSegments
 import de.igor.gun.sleep.analyzer.ui.theme.BlueTranslucent
 import de.igor.gun.sleep.analyzer.ui.theme.Green
 import de.igor.gun.sleep.analyzer.ui.theme.Red
@@ -37,7 +40,7 @@ class DataRepository @Inject constructor(
     private fun getEndDateFromMeasurements(seriesId: Long): LocalDateTime? =
         try {
             getMeasurements(seriesId).last().date
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
 
@@ -60,22 +63,16 @@ class DataRepository @Inject constructor(
         showRmse: Boolean,
     ) {
         getMeasurements(seriesId).also { measurements ->
-            val hrRmse = computeHRRmse(measurements, frameSizeHR = appParameters.frameSizeHR, quantizationHR = appParameters.quantizationHR)
-            val accRmse = computeACC(measurements, frameSizeACC = appParameters.frameSizeACC, quantizationACC = appParameters.quantizationACC)
             fillChart(
                 chartBuilder,
                 types,
                 measurements,
                 typesRmse,
-                hrRmse,
-                accRmse,
-                showRmse,
-                frameSizeHR = appParameters.frameSizeHR
+                showRmse
             )
             fillHypnogram(
                 hypnogramHolder,
-                hrRmse,
-                accRmse
+                measurements
             )
         }
     }
@@ -96,12 +93,9 @@ class DataRepository @Inject constructor(
         hypnogramHolder: HypnogramHolder,
     ) {
         getMeasurements(seriesId).also { measurements ->
-            val hrRmse = computeHRRmse(measurements, frameSizeHR = appParameters.frameSizeHR, quantizationHR = appParameters.quantizationHR)
-            val accRmse = computeACC(measurements, frameSizeACC = appParameters.frameSizeACC, quantizationACC = appParameters.quantizationACC)
             fillHypnogram(
                 hypnogramHolder,
-                hrRmse,
-                accRmse,
+                measurements
             )
         }
     }
@@ -110,20 +104,10 @@ class DataRepository @Inject constructor(
         synchronized(this) {
             val hypnogramHolder = HypnogramHolder().apply {
                 fillHypnogramWithMeasurements(series.id, this)
-            }
-            val endTime = getEndDateFromMeasurements(series.id) ?: LocalDateTime.now()
-            SleepPhasesHolder().apply {
-                val sleepDataPoints = hypnogramHolder.buildSleepDataPoints()
-                setSleepDataPoints(
-                    sleepDataPoints,
-                    startTime = series.startDate,
-                    endTime = series.endDate ?: endTime
-                )
                 dbManager.recreateHypnogram(series.id, this)
             }
             hypnogramHolder
-                .buildSleepDataPoints()
-                .toSegments(endTime = series.endDate ?: endTime, startTime = series.startDate)
+                .buildSleepSegments()
                 .computeDistribution()
                 .ifValid {
                     dbManager.updateCache(
@@ -136,13 +120,12 @@ class DataRepository @Inject constructor(
 
     private fun fillHypnogram(
         hypnogramHolder: HypnogramHolder,
-        hrRmse: List<PointF>,
-        accRmse: List<PointF>,
+        measurements: List<Measurement>,
     ) {
-        if (hrRmse.isEmpty() || accRmse.isEmpty()) return
-        val hypnogram = computeUniformHypnogram(hrRmse, accRmse)
+        if (measurements.isEmpty()) return
+        val hypnogram = computeUniformHypnogram(measurements)
         if (hypnogram.isEmpty()) return
-        hypnogramHolder.setUniformSleepDataPoints(hypnogram)
+        hypnogramHolder.setSleepSegments(hypnogram)
     }
 
     private fun fillChart(
@@ -150,10 +133,7 @@ class DataRepository @Inject constructor(
         measurementIds: List<Measurement.Id>,
         measurements: List<Measurement>,
         typesRmse: List<Measurement.Id>,
-        hrRmse: List<PointF>,
-        accRmse: List<PointF>,
-        showRmse: Boolean = true,
-        frameSizeHR: Int,
+        showRmse: Boolean = true
     ) {
         chartBuilder.clear()
         val idWithColor = measurementIds.toIdWithColor()
@@ -161,7 +141,10 @@ class DataRepository @Inject constructor(
             this[Measurement.Id.HR]?.rescaleY(30f, 100f)
         }
         charts.forEach { chartBuilder.addChart(it.value) }
-        if (frameSizeHR == 0) return
+        if (appParameters.frameSizeHR == 0) return
+
+        val hrRmse = createSquares(Measurement.Id.HR, measurements)
+        val acc = createSquares(Measurement.Id.ACC, measurements)
         if (Measurement.Id.HR in typesRmse && showRmse) {
             val hrRmseChart = ChartBuilder.ChartPresentation.Chart(
                 id = "RMSE:" + Measurement.Id.HR.name,
@@ -174,54 +157,105 @@ class DataRepository @Inject constructor(
         if (Measurement.Id.ACC in typesRmse && showRmse) {
             val accRMSEChart = ChartBuilder.ChartPresentation.Chart(
                 id = "RMSE:" + Measurement.Id.ACC.name,
-                points = accRmse,
+                points = acc,
                 color = Green.toArgb(),
                 fillColor = BlueTranslucent.toArgb()
             )
             chartBuilder.addChart(accRMSEChart)
         }
-        if (hrRmse.isEmpty() || accRmse.isEmpty()) return
+        if (hrRmse.isEmpty() || acc.isEmpty()) return
         if (Measurement.Id.HR in typesRmse || Measurement.Id.ACC in typesRmse) return
-        val results = accRmse.zip(hrRmse) { acc, hr -> PointF(acc.x, acc.y * hr.y) }
         if (showRmse) {
-            val accRMSEChart = ChartBuilder.ChartPresentation.Chart(
-                id = "RMSE HR*ACC",
-                points = results,
+            val overlay = createOverlay(measurements)
+            val overlay1Chart = ChartBuilder.ChartPresentation.Chart(
+                id = "OVERLAY 1",
+                points = overlay.first,
                 color = Red.toArgb(),
                 fillColor = RedTranslucent.toArgb()
             )
-            chartBuilder.addChart(accRMSEChart)
+            chartBuilder.addChart(overlay1Chart)
+            val overlay2Chart = ChartBuilder.ChartPresentation.Chart(
+                id = "OVERLAY 2",
+                points = overlay.second,
+                color = Red.toArgb(),
+                fillColor = BlueTranslucent.toArgb()
+            )
+            chartBuilder.addChart(overlay2Chart)
+        }
+    }
+
+    private fun createOverlay(
+        measurements: List<Measurement>
+    ): Pair<List<PointF>, List<PointF>> {
+        val hr = measurements.toHCPoint(Measurement.Id.HR)
+        val acc = measurements.toHCPoint(Measurement.Id.ACC)
+        val results = hcBinding.createOverlay(hr, acc, appParameters.toHCModelConfigurationParams())
+        val hrSquare = results
+            .map { it.first }
+            .toPointFs(hr)
+        val accSquare = results
+            .map { it.second }
+            .toPointFs(acc)
+        return Pair(hrSquare, accSquare)
+    }
+
+    private fun createSquares(
+        id: Measurement.Id,
+        measurements: List<Measurement>
+    ): List<PointF> {
+        val values = measurements.toHCPoint(id)
+        when (id) {
+            Measurement.Id.HR -> return hcBinding
+                .createUniformInput(
+                    values,
+                    appParameters.frameSizeHR.toDouble(),
+                    appParameters.quantizationHR.toDouble(),
+                    appParameters.hrHiPassCutoff
+                )
+                .toPointFs()
+
+            Measurement.Id.ACC -> return hcBinding
+                .createUniformInput(
+                    values,
+                    appParameters.frameSizeACC.toDouble(),
+                    appParameters.quantizationACC.toDouble(),
+                    appParameters.accHiPassCutoff
+                )
+                .toPointFs()
+
+            else -> return emptyList()
         }
     }
 
     private fun computeHRRmse(
-        measurements: List<Measurement>,
-        frameSizeHR: Int,
-        quantizationHR: Float,
+        measurements: List<Measurement>
     ): List<PointF> {
-        val x = measurements.toMillisSinceStart()
-        val y = measurements.mapToValues(Measurement.Id.HR)
-        return hcBinding
-            .segmentation(x = x, y = y, frameSizeHR, quantizationHR)
+        val hr = measurements.toHCPoint(Measurement.Id.HR)
+        return hr
+            .rmse(appParameters.frameSizeHR)
+            .toPointFs()
     }
 
     private fun computeACC(
-        measurements: List<Measurement>,
-        frameSizeACC: Int,
-        quantizationACC: Float,
+        measurements: List<Measurement>
     ): List<PointF> {
-        val x = measurements.toMillisSinceStart()
-        val y = measurements.mapToValues(Measurement.Id.ACC)
-        return hcBinding
-            .segmentation(x = x, y = y, frameSizeACC, quantizationACC)
+        val acc = measurements.toHCPoint(Measurement.Id.ACC)
+        return acc
+            .mean(appParameters.frameSizeACC)
+            .normalize()
+            .toPointFs()
     }
 
     private fun computeUniformHypnogram(
-        hrRmse: List<PointF>,
-        accRmse: List<PointF>,
-    ): List<HypnogramHolder.SleepDataPoint> {
-        return hcBinding
-            .computeUniformHypnogram(quantizedHR = hrRmse, quantizedACC = accRmse, minimalSleepPhaseLengthMs = 10 * 60 * 1000)
-            .mapToSleepDataPoint()
+        measurements: List<Measurement>
+    ): List<SleepSegment> {
+        val hr = measurements.toHCPoint(Measurement.Id.HR)
+        val acc = measurements.toHCPoint(Measurement.Id.ACC)
+        val hypnogram = hcBinding.createHypnogram(
+            hr,
+            acc,
+            appParameters.toHCModelConfigurationParams()
+        )
+        return hypnogram.hcSleepPhase2Segments(hr[0].x.toLong() / 1000)
     }
 }

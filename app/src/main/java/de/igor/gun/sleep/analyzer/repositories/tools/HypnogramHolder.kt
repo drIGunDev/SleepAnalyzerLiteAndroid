@@ -5,10 +5,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import de.igor.gun.sleep.analyzer.misc.toSeconds
 import de.igor.gun.sleep.analyzer.ui.theme.AWAKEColor
 import de.igor.gun.sleep.analyzer.ui.theme.DSLEEPColor
 import de.igor.gun.sleep.analyzer.ui.theme.LSLEEPColor
 import de.igor.gun.sleep.analyzer.ui.theme.REMColor
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 
 class HypnogramHolder {
@@ -25,42 +30,17 @@ class HypnogramHolder {
         }
     }
 
-    data class SleepStateDistribution(val absolutMillis: Map<SleepState, Float>) {
-        fun relative(): Map<SleepState, Float> {
-            val total = absolutMillis.values.sum()
-            return absolutMillis.mapValues { if (total == 0f) 0f else it.value / total }
-        }
-        val isValid: Boolean get() = absolutMillis.values.sum() > 0
-        fun ifValid(block:SleepStateDistribution.()->Unit) {
-            if (isValid) block()
-        }
-    }
-
-    data class SleepDataPoint(val time: Long, val state: SleepState)
-
-    var sleepDataPoints: List<SleepDataPoint> = listOf()
+    private var sleepSegments: List<SleepSegment> = listOf()
     private var screenWight: Float = 0f
     private var screenHeight: Float = 0f
 
     private var xFactor: Float = 0f
     private var yFactor: Float = 0f
 
-    fun setUniformSleepDataPoints(sleepDataPoints: List<SleepDataPoint>) = run { this.sleepDataPoints = sleepDataPoints; rescale() }
+    fun setSleepSegments(sleepSegments: List<SleepSegment>) = run { this.sleepSegments = sleepSegments; rescale() }
+    fun isEmpty() = sleepSegments.isEmpty()
     fun setWidth(width: Float) = run { screenWight = width; rescale() }
     fun setHeight(height: Float) = run { screenHeight = height; rescale() }
-
-    private fun List<SleepDataPoint>.duration(): Long = if (isEmpty()) 0L else last().time - first().time
-
-    private fun rescale() {
-        if (sleepDataPoints.isEmpty()) return
-        val timeInterval = sleepDataPoints.last().time - sleepDataPoints.first().time
-        xFactor = screenWight / timeInterval
-        val stateInterval = (SleepState.entries.size - 1) * VERTICAL_UNIT_SIZE
-        yFactor = (screenHeight - VERTICAL_GAP) / stateInterval
-    }
-
-    private fun transformToX(time: Long): Float = (time.toFloat() - sleepDataPoints.first().time) * xFactor
-    private fun transformToY(stage: SleepState): Float = stage.level.toFloat() * yFactor * VERTICAL_UNIT_SIZE
 
     fun buildPath(): Path = buildList().convertToPath()
 
@@ -71,19 +51,61 @@ class HypnogramHolder {
             end = Offset(0f, screenHeight)
         )
 
-    fun buildSleepDataPoints(): List<SleepDataPoint> = sleepDataPoints
+    fun buildSleepSegments(): List<SleepSegment> {
+        if (!sleepSegments.isEmpty()) return sleepSegments
+        return listOf(SleepSegment(LocalDateTime.now(ZoneOffset.UTC), 10f, SleepState.AWAKE))
+    }
+
+    private fun rescale() {
+        if (sleepSegments.isEmpty()) return
+        val duration = sleepSegments.last().time.toSeconds() - sleepSegments.first().time.toSeconds() + sleepSegments.last().durationSeconds
+        xFactor = screenWight / duration
+        val stateInterval = (SleepState.entries.size - 1) * VERTICAL_UNIT_SIZE
+        yFactor = (screenHeight - VERTICAL_GAP) / stateInterval
+    }
+
+    private fun transformToX(time: Long): Float = (time.toFloat() - sleepSegments.first().time.toSeconds()) * xFactor
+    private fun transformToY(stage: SleepState): Float = stage.level.toFloat() * yFactor * VERTICAL_UNIT_SIZE
 
     private fun buildList(): List<PointF> {
+        val lines = buildLines()
+        if (lines.isEmpty()) return listOf()
         val results = mutableListOf<PointF>()
-        results.addAll(buildLine())
-        results.addAll(shift(buildLine().reversed()))
+        results.addAll(lines)
+        results.addAll(shift(lines.reversed()))
         return results
     }
 
-    private fun buildLine(): List<PointF> = sleepDataPoints.map { PointF(transformToX(it.time), transformToY(it.state)) }
+    private fun buildLines(): List<PointF> {
+        val result = mutableListOf<PointF>()
+        var statePrevious = sleepSegments.first().state
+        for (i in 0..<sleepSegments.size) {
+            if (i != 0) {
+                result.add(PointF(transformToX(sleepSegments[i].time.toSeconds()), transformToY(statePrevious)))
+            }
+            result.add(PointF(transformToX(sleepSegments[i].time.toSeconds()), transformToY(sleepSegments[i].state)))
+            statePrevious = sleepSegments[i].state
+            if (i == sleepSegments.size - 1) {
+                result.add(PointF(transformToX(sleepSegments[i].time.toSeconds() + sleepSegments[i].durationSeconds.toLong()), transformToY(statePrevious)))
+            }
+        }
+        return result
+    }
 
     companion object {
         const val VERTICAL_UNIT_SIZE = 10
+        val INNER_GAP = 10.dp
+        val FONT_SIZE = 20.sp
+        val H_MARKER_SIZE = 2.dp
+        val DIAL_THICKNESS = 1.dp
+        val BAR_THICKNESS = 10.dp
+
+        val colorMap = mapOf(
+            SleepState.AWAKE to AWAKEColor,
+            SleepState.LIGHT_SLEEP to LSLEEPColor,
+            SleepState.DEEP_SLEEP to DSLEEPColor,
+            SleepState.REM to REMColor,
+        )
 
         private const val VERTICAL_GAP = 15
         private const val HORIZONTAL_GAP = 1

@@ -16,6 +16,7 @@ import de.igor.gun.sleep.analyzer.repositories.DataRepository
 import de.igor.gun.sleep.analyzer.repositories.MeasurementsRecorder
 import de.igor.gun.sleep.analyzer.repositories.tools.ChartBuilder
 import de.igor.gun.sleep.analyzer.repositories.tools.HypnogramHolder
+import de.igor.gun.sleep.analyzer.repositories.tools.SleepSegment
 import de.igor.gun.sleep.analyzer.services.sensors.PPGSource
 import de.igor.gun.sleep.analyzer.services.sensors.SensorAPI
 import de.igor.gun.sleep.analyzer.services.sensors.SensorDataSource
@@ -131,9 +132,7 @@ class TrackingViewModel @Inject constructor(
         )
     }
 
-    val startTime: Long get() = recorder.startTimeMillis
-
-    val sleepPhasesListState = mutableStateOf<List<HypnogramHolder.SleepDataPoint>>(listOf())
+    val sleepSegments = mutableStateOf<List<SleepSegment>>(listOf())
 
     private fun requestHypnogram(seriesId: Long) {
         val hypnogramHolder = HypnogramHolder()
@@ -142,7 +141,7 @@ class TrackingViewModel @Inject constructor(
                 hypnogramHolder = hypnogramHolder,
                 seriesId = seriesId
             )
-            sleepPhasesListState.value = hypnogramHolder.buildSleepDataPoints()
+            sleepSegments.value = hypnogramHolder.buildSleepSegments()
         }
     }
 }

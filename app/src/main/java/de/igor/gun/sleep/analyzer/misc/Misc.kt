@@ -4,19 +4,12 @@ import android.annotation.SuppressLint
 import android.graphics.PointF
 import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
-import java.util.Date
 import java.util.Locale
 
-
-class TimeMeasurer {
-    private var startDate: Date = Date()
-    fun start() = run { startDate = Date() }
-    fun stop() = Date().time - startDate.time
-}
 
 fun LocalDateTime.durationUntilNow(): String {
     return duration(untilDate = LocalDateTime.now())
@@ -123,12 +116,23 @@ fun LocalDateTime.formatToString(
     }
 }
 
-fun LocalDateTime.toMillis(zoneOffset: ZoneOffset = ZoneOffset.UTC): Long =
-    this.get(ChronoField.MILLI_OF_SECOND) + toEpochSecond(zoneOffset) * 1000
+fun LocalDateTime.toMillis(zoneId: ZoneId = ZoneId.systemDefault()): Long =
+    this.atZone(zoneId).toInstant().toEpochMilli()
+
+fun LocalDateTime.toSeconds(offset: ZoneOffset = ZoneOffset.UTC): Long =
+    this.toEpochSecond(offset)
 
 //time format example "2024-02-06T00:00:00"
-fun String.parseLocalDateTimeToMillis(zoneOffset: ZoneOffset = ZoneOffset.UTC): Long =
-    LocalDateTime.parse(this).toMillis(zoneOffset)
+fun String.parseLocalDateTimeToMillis(zoneId: ZoneId = ZoneId.systemDefault()): Long {
+    val ldt = LocalDateTime.parse(this)
+    return ldt.atZone(zoneId).toInstant().toEpochMilli()
+}
+
+//time format example "2024-02-06T00:00:00"
+fun String.parseLocalDateTimeToSeconds(zoneId: ZoneId = ZoneId.systemDefault()): Long {
+    val ldt = LocalDateTime.parse(this)
+    return ldt.atZone(zoneId).toEpochSecond()
+}
 
 fun LocalDateTime.daysAgoMillis(daysAgo: Int, zoneOffset: ZoneOffset = ZoneOffset.UTC): Long {
     val daysInMillis = daysAgo.toLong() * 24 * 60 * 60 * 1000
@@ -142,7 +146,6 @@ fun LocalDateTime.daysAfterMillis(daysAfter: Int, zoneOffset: ZoneOffset = ZoneO
 
 fun LocalDateTime.daysRelativeMillis(daysAgoOrAfter: Int, zoneOffset: ZoneOffset = ZoneOffset.UTC): Long =
     if (daysAgoOrAfter < 0) this.daysAgoMillis(-daysAgoOrAfter, zoneOffset) else this.daysAfterMillis(daysAgoOrAfter, zoneOffset)
-
 
 fun Long.toLocalDateTime(zoneOffset: ZoneOffset = ZoneOffset.UTC): LocalDateTime =
     Instant

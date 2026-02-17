@@ -31,23 +31,26 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
-import de.igor.gun.sleep.analyzer.repositories.tools.SleepPhasesHolder
-import de.igor.gun.sleep.analyzer.repositories.tools.SleepPhasesHolder.Companion.BAR_THICKNESS
-import de.igor.gun.sleep.analyzer.repositories.tools.SleepPhasesHolder.Companion.FONT_SIZE
-import de.igor.gun.sleep.analyzer.repositories.tools.SleepPhasesHolder.Companion.H_MARKER_SIZE
-import de.igor.gun.sleep.analyzer.repositories.tools.SleepPhasesHolder.Companion.INNER_GAP
+import de.igor.gun.sleep.analyzer.misc.toSeconds
+import de.igor.gun.sleep.analyzer.repositories.tools.HypnogramHolder
+import de.igor.gun.sleep.analyzer.repositories.tools.HypnogramHolder.Companion.BAR_THICKNESS
+import de.igor.gun.sleep.analyzer.repositories.tools.HypnogramHolder.Companion.FONT_SIZE
+import de.igor.gun.sleep.analyzer.repositories.tools.HypnogramHolder.Companion.H_MARKER_SIZE
+import de.igor.gun.sleep.analyzer.repositories.tools.HypnogramHolder.Companion.INNER_GAP
 import de.igor.gun.sleep.analyzer.ui.theme.AWAKEColor
 import de.igor.gun.sleep.analyzer.ui.theme.ConstructionColor
 import de.igor.gun.sleep.analyzer.ui.theme.MainWhiteColor
 import de.igor.gun.sleep.analyzer.ui.theme.Yellow
 import de.igor.gun.sleep.analyzer.ui.tools.calendar.drawPoint
+import java.time.Instant
+import java.time.ZoneId
 import kotlin.math.cos
 import kotlin.math.sin
 
 
 @Composable
 fun CircularHypnogram(
-    holder: SleepPhasesHolder,
+    holder: HypnogramHolder,
     modifier: Modifier = Modifier,
     showRunner: Boolean = true,
     invalidateRunner: MutableState<Boolean> = mutableStateOf(false),
@@ -92,7 +95,7 @@ private fun DrawScope.drawDial(
         ConstructionColor,
         radius = radius,
         style = Stroke(
-            SleepPhasesHolder.DIAL_THICKNESS.toPx(),
+            HypnogramHolder.DIAL_THICKNESS.toPx(),
         )
     )
     val innerRadius = computeInnerRadius(radius)
@@ -100,7 +103,7 @@ private fun DrawScope.drawDial(
         ConstructionColor,
         radius = innerRadius,
         style = Stroke(
-            SleepPhasesHolder.DIAL_THICKNESS.toPx(),
+            HypnogramHolder.DIAL_THICKNESS.toPx(),
             pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 8f), 0f)
         )
     )
@@ -142,26 +145,24 @@ private fun DrawScope.drawDial(
 
 private fun DrawScope.drawSleepPhases(
     radius: Float,
-    holder: SleepPhasesHolder,
+    holder: HypnogramHolder,
     showSleepStates: Boolean,
 ) {
-    val segments = holder.buildSegments()
+    val segments = holder.buildSleepSegments()
     if (segments.isEmpty()) return
 
     val measurementsRadius = computeMeasurementsRadius(radius)
-
-    var startAngle: Float
     var duration = 0f
-    val hourMillis = 60 * 1000 * 2
+    val hourSeconds = 60 * 2
 
+    var startAngle: Float = epochSecondsToClockAngle12h(segments.first().time.toSeconds())
     for (segment in segments) {
-        startAngle = segment.startAngle
         val color: Color = if (showSleepStates) {
-            SleepPhasesHolder.colorMap[segment.state]!!
+            HypnogramHolder.colorMap[segment.state]!!
         } else {
             MainWhiteColor
         }
-        val partDuration = segment.duration / hourMillis
+        val partDuration = segment.durationSeconds / hourSeconds
         drawArc(
             startAngle = startAngle,
             duration = partDuration,
@@ -172,10 +173,10 @@ private fun DrawScope.drawSleepPhases(
         duration += partDuration
     }
     drawCap(
-        segments[0].startAngle,
+        epochSecondsToClockAngle12h(segments.first().time.toSeconds()),
         duration,
-        SleepPhasesHolder.colorMap[segments.first().state] ?: AWAKEColor,
-        SleepPhasesHolder.colorMap[segments.last().state] ?: AWAKEColor,
+        HypnogramHolder.colorMap[segments.first().state] ?: AWAKEColor,
+        HypnogramHolder.colorMap[segments.last().state] ?: AWAKEColor,
         measurementsRadius
     )
 }
@@ -244,3 +245,12 @@ private fun DrawScope.drawRunner(
 
 private fun DrawScope.computeMeasurementsRadius(radius: Float) = radius - BAR_THICKNESS.toPx() / 2 - INNER_GAP.toPx()
 private fun DrawScope.computeInnerRadius(radius: Float) = computeMeasurementsRadius(radius) - BAR_THICKNESS.toPx() - INNER_GAP.toPx() / 2
+
+private const val SECONDS_IN_12H = 12 * 60 * 60
+
+fun epochSecondsToClockAngle12h(epochSeconds: Long, zoneId: ZoneId = ZoneId.systemDefault()): Float {
+    val localTime = Instant.ofEpochSecond(epochSeconds).atZone(zoneId).toLocalTime()
+    val sec = localTime.toSecondOfDay() % SECONDS_IN_12H
+    val raw = sec.toFloat() / SECONDS_IN_12H * 360f
+    return raw - 90f
+}

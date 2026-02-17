@@ -16,8 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import de.igor.gun.sleep.analyzer.db.entities.toSatisfaction
-import de.igor.gun.sleep.analyzer.misc.toLocalDateTime
-import de.igor.gun.sleep.analyzer.repositories.tools.SleepPhasesHolder
+import de.igor.gun.sleep.analyzer.repositories.tools.HypnogramHolder
 import de.igor.gun.sleep.analyzer.ui.misc.viewModel
 import de.igor.gun.sleep.analyzer.ui.screens.tracking.model.SensorViewModel
 import de.igor.gun.sleep.analyzer.ui.screens.tracking.model.ServiceViewModel
@@ -31,7 +30,6 @@ import de.igor.gun.sleep.analyzer.ui.screens.tracking.views.ShowStartServiceAler
 import de.igor.gun.sleep.analyzer.ui.screens.tracking.views.ShowTrackingContent
 import de.igor.gun.sleep.analyzer.ui.screens.tracking.views.cancelSatisfactionDialog
 import de.igor.gun.sleep.analyzer.ui.tools.hypnogram.CircularHypnogram
-import java.time.LocalDateTime
 
 
 @Composable
@@ -108,12 +106,8 @@ fun TrackingTab(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    holder = SleepPhasesHolder().apply {
-                        setSleepDataPoints(
-                            sleepDataPoints = gathererViewModel.sleepPhasesListState.value,
-                            startTime = gathererViewModel.startTime.toLocalDateTime(),
-                            endTime = LocalDateTime.now()
-                        )
+                    holder = HypnogramHolder().apply {
+                        setSleepSegments(sleepSegments = gathererViewModel.sleepSegments.value)
                     },
                     showSleepStates = true,
                     showRunner = gathererViewModel.isRecording.value,

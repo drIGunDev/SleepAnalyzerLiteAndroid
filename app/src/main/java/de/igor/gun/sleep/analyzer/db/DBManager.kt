@@ -9,7 +9,7 @@ import de.igor.gun.sleep.analyzer.db.entities.toChart
 import de.igor.gun.sleep.analyzer.db.entities.toIdWithColor
 import de.igor.gun.sleep.analyzer.repositories.tools.ChartBuilder
 import de.igor.gun.sleep.analyzer.repositories.tools.HypnogramHolder
-import de.igor.gun.sleep.analyzer.repositories.tools.SleepPhasesHolder
+import de.igor.gun.sleep.analyzer.repositories.tools.SleepStateDistribution
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.isActive
@@ -33,7 +33,7 @@ class DBManager(private val appDatabase: AppDatabase) {
         minHRScaled: Float? = null,
         maxHRScaled: Float? = null,
         maxXScaled: Float? = null,
-        hypnogram: HypnogramHolder.SleepStateDistribution? = null,
+        hypnogram: SleepStateDistribution? = null,
     ) {
         synchronized(this) {
             chartBuilder.clear()
@@ -95,7 +95,7 @@ class DBManager(private val appDatabase: AppDatabase) {
         minHRScaled: Float? = null,
         maxHRScaled: Float? = null,
         duration: Float? = null,
-        hypnogram: HypnogramHolder.SleepStateDistribution? = null,
+        hypnogram: SleepStateDistribution? = null,
     ) {
         synchronized(this) {
             chartBitmap?.let {
@@ -137,7 +137,7 @@ class DBManager(private val appDatabase: AppDatabase) {
         }
     }
 
-    fun updateCache(series: Series, hypnogram: HypnogramHolder.SleepStateDistribution) {
+    fun updateCache(series: Series, hypnogram: SleepStateDistribution) {
         synchronized(this) {
             val savedCache = appDatabase.cacheDAO().get(series.id)
             if (savedCache != null) {
@@ -216,10 +216,10 @@ class DBManager(private val appDatabase: AppDatabase) {
             return appDatabase.cacheHypnogramDAO().get(series.id)
         }
 
-    fun recreateHypnogram(seriesId: Long, sleepPhasesHolder: SleepPhasesHolder) {
+    fun recreateHypnogram(seriesId: Long, hypnogramHolder: HypnogramHolder) {
         synchronized(this) {
             appDatabase.cacheHypnogramDAO().delete(seriesId)
-            val hypnogram = sleepPhasesHolder.buildSegments()
+            val hypnogram = hypnogramHolder.buildSleepSegments()
             if (hypnogram.isEmpty()) return
             hypnogram.forEach {
                 appDatabase.cacheHypnogramDAO().insert(CacheHypnogram(it.state, it.time, seriesId))
@@ -264,7 +264,7 @@ class DBManager(private val appDatabase: AppDatabase) {
         maxXScaled: Float?,
         chartBuilder: ChartBuilder,
         measurementIds: List<Measurement.Id>,
-        hypnogram: HypnogramHolder.SleepStateDistribution? = null,
+        hypnogram: SleepStateDistribution? = null,
         coroutineContext: CoroutineContext,
         progressCancelHandler: ProgressCancelHandler? = null,
         progressHandler: ProgressHandler? = null,
@@ -296,7 +296,7 @@ class DBManager(private val appDatabase: AppDatabase) {
         maxXScale: Float?,
         chartBuilder: ChartBuilder,
         measurementIds: List<Measurement.Id>,
-        hypnogram: HypnogramHolder.SleepStateDistribution? = null,
+        hypnogram: SleepStateDistribution? = null,
         progressHandler: ProgressHandler? = null,
         completion: ProgressCompletionHandler? = null,
     ) {
