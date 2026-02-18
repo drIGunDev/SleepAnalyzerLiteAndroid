@@ -40,6 +40,7 @@ class TrackingViewModel @Inject constructor(
     val chartBuilder: ChartBuilder,
 ) : ViewModel() {
 
+    val sensorDataSource: SensorDataSource get() = dataSource
     val hrFlow get() = dataSource.hrFlow
     val batteryFlow get() = sensorAPI.batteryFlow
     val rssiFlow get() = sensorAPI.rssiFlow

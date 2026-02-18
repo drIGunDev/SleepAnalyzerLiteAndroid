@@ -32,7 +32,6 @@ fun ShowTrackingContent(
     stopRecordingShowSatisfactionDialog: MutableState<Boolean>,
     startRecordingShowAlert: MutableState<Boolean>,
 ) {
-    val ppgSource = gathererViewModel.ppgSource
     val context = LocalContext.current
     val hr = gathererViewModel.hrFlow.collectAsState(0)
     val isStreaming = sensorViewModel.connectionState.value == SensorViewModel.ConnectionState.STREAMING
@@ -42,17 +41,15 @@ fun ShowTrackingContent(
     ) {
         val (button, text, measurements) = createRefs()
         PPGIndicator(
-            ppgSource = ppgSource,
+            sensorDataSource = gathererViewModel.sensorDataSource,
             modifier = Modifier
-                .width(170.dp)
-                .height(30.dp)
+                .width(180.dp)
+                .height(70.dp)
                 .constrainAs(measurements) {
                     top.linkTo(parent.top, margin = 100.dp)
                     bottom.linkTo(text.top, margin = 50.dp)
                     centerHorizontallyTo(text)
                 },
-            xResolution = 2,
-            showStream = isStreaming
         )
         Text(
             modifier = Modifier.constrainAs(text) {
