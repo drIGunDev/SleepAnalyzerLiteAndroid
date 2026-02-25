@@ -35,7 +35,7 @@ fun RowScope.ShowMenu(
 
     IconButton(onClick = { shouldShowMainMenu.value = !shouldShowMainMenu.value }) {
         Icon(
-            imageVector = Icons.Default.MoreVert,
+            imageVector = Icons.Filled.MoreVert,
             contentDescription = "Main Menu"
         )
     }
