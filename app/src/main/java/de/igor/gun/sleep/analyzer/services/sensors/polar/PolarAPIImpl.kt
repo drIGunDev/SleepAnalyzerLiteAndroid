@@ -8,10 +8,15 @@ import com.polar.sdk.api.PolarBleApiCallback
 import com.polar.sdk.api.model.PolarDeviceInfo
 import com.polar.sdk.api.model.PolarHealthThermometerData
 import de.igor.gun.sleep.analyzer.services.sensors.SensorAPI
-import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.UUID
@@ -29,6 +34,8 @@ class PolarAPIImpl(private val bleAPI: PolarBleApi) : SensorAPI {
     override val sensorStateFlow = MutableStateFlow<SensorAPI.SensorState>(SensorAPI.SensorState.Undefined)
     override val sensorConnectionFlow = MutableStateFlow<String?>(null)
     override val streamingStateFlow = MutableStateFlow<SensorAPI.StreamingState>(SensorAPI.StreamingState.Stopped)
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     private val polarBleApiCallback = object : PolarBleApiCallback() {
         override fun blePowerStateChanged(powered: Boolean) {
@@ -110,7 +117,7 @@ class PolarAPIImpl(private val bleAPI: PolarBleApi) : SensorAPI {
     }
 
     private fun startHRFlow() {
-        CoroutineScope(Dispatchers.Default).launch {
+        scope.launch {
             sensorConnectionFlow.collect {
                 it?.let { sensorId ->
                     startHRBroadcastFlow(sensorId)
@@ -119,26 +126,25 @@ class PolarAPIImpl(private val bleAPI: PolarBleApi) : SensorAPI {
         }
     }
 
-    private var hrBroadcast: Disposable? = null
+    private var hrBroadcast: Job? = null
     private fun startHRBroadcastFlow(sensorId: String?) {
         rssiFlow.value = -200
         sensorId?.let {
             Timber.w("--->>HR broadcast wont to be started with sensorId = $sensorId")
-            hrBroadcast?.dispose()
+            hrBroadcast?.cancel()
             hrBroadcast = null
 
             hrBroadcast = bleAPI.startListenForPolarHrBroadcasts(setOf(sensorId))
-                .subscribe(
-                    {
-                        val rssi = it.polarDeviceInfo.rssi
-                        rssiFlow.value = rssi
-                    },
-                    { error: Throwable -> Timber.e("--->>HR broadcast failed. Reason $error") },
-                    { Timber.w("--->>HR broadcast complete") }
-                )
+                .onEach {
+                    val rssi = it.polarDeviceInfo.rssi
+                    rssiFlow.value = rssi
+                }
+                .catch { error: Throwable -> Timber.e("--->>HR broadcast failed. Reason $error") }
+                .onCompletion { Timber.w("--->>HR broadcast complete") }
+                .launchIn(scope)
         }
             ?: run {
-                hrBroadcast?.dispose()
+                hrBroadcast?.cancel()
                 hrBroadcast = null
                 Timber.w("--->>HR broadcast disposed")
             }

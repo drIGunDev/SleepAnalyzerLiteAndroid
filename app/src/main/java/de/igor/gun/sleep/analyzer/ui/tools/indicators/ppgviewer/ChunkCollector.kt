@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.math.abs
 
 class ChunkCollector(
     private val collectionPeriodSec: Double = PPGViewerV2Config.COLLECTION_PERIOD_SEC,
@@ -35,7 +36,7 @@ class ChunkCollector(
         val first = buffer.first().timeStamp
         val last = buffer.last().timeStamp
         val intervalNs = last - first
-        if (intervalNs < collectionPeriodSec.toLong() * 1_000_000_000L) return
+        if (abs(intervalNs) < collectionPeriodSec.toLong() * 1_000_000_000L) return
 
         isConsuming = true
         transferFrame()

@@ -39,6 +39,7 @@ import de.igor.gun.sleep.analyzer.ui.tools.indicators.batteryindicator.BatteryIn
 import de.igor.gun.sleep.analyzer.ui.tools.indicators.rssiindicator.RSSIIndicator
 import kotlinx.coroutines.delay
 import java.time.LocalDateTime
+import kotlin.time.Duration.Companion.milliseconds
 
 
 @SuppressLint("DefaultLocale")
@@ -67,7 +68,7 @@ fun ShowSensorInfoPanel(
         if (!showSelectSensorDialog.value) return@LaunchedEffect
 
         sensorViewModel.resetAvailableSensors()
-        delay(500)
+        delay(1000.milliseconds)
         sensorViewModel.startScanSensors()
     }
 

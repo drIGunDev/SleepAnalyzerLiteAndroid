@@ -26,7 +26,7 @@ import de.igor.gun.sleep.analyzer.ui.theme.MainBackgroundColor
 import kotlinx.coroutines.isActive
 
 object PPGViewerV2Config {
-    const val COLLECTION_PERIOD_SEC = 3.0
+    const val COLLECTION_PERIOD_SEC = 4.0
     const val DIMMING_FACTOR = 0.2
 }
 

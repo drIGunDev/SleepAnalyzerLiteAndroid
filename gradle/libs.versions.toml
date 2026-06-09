@@ -11,10 +11,8 @@ espressoCore = "3.7.0"
 kotlinxSerializationJson = "1.10.0"
 navigationCompose = "2.9.7"
 timber = "5.0.1"
-rxandroid = "3.0.2"
-rxjava = "3.1.12"
 roomKtx = "2.8.4"
-polarBleSdk = "6.15.0"
+polarBleSdk = "7.0.1"
 hiltAndroid = "2.59.2"
 lifecycleRuntimeKtx = "2.10.0"
 hiltNavigationCompose = "1.3.0"
@@ -58,10 +56,6 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 
 #polar sdk
 polar-ble-sdk = { module = "com.github.polarofficial:polar-ble-sdk", version.ref = "polarBleSdk" }
-
-#javarx
-rxandroid = { module = "io.reactivex.rxjava3:rxandroid", version.ref = "rxandroid" }
-rxjava = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxjava" }
 
 #hilt
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
